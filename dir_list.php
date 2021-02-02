@@ -130,7 +130,7 @@ class DirectoryListing {
 		'modified'
 	);
 
-	private $__sortOrder = 'asc';
+	private $__sortOrder = 'desc';
 
 	public function __construct() {
 		define('DS', '/');
@@ -803,11 +803,17 @@ function pr($data, $die = false) {
 		<?php endif; ?>
 
 		<form action="" method="post" enctype="multipart/form-data" class="text-center upload-form form-vertical">
-	    	<input type='text' name='search' value='' id="search_file">
-	    	<input type='submit' name='submit' value='Search' id="search">
-	   	</form>
+	    	<input type='text' name='search' value='' id="search_file" placeholder="Search your file here">
+	    </form>
+	   	<?php 
+   			$search_res = (isset($_POST['search']) && !empty($_POST['search']))?$_POST['search']:'';
+   			if($search_res){?>
+   				<div id="search_res">
+   				</div>
+   			<?php }
+   		?>
 	   <?php if (! empty($data['files'])): ?>
-				<div class="row">
+				<div class="row" id="list_file">
 					<div class="col-xs-12">
 						<div class="table-container">
 							<table class="table table-striped table-bordered">
@@ -824,8 +830,10 @@ function pr($data, $die = false) {
 										</th>
 									</tr>
 								</thead>
-								<tbody>
-								<?php foreach ($data['files'] as $file): ?>
+								<tbody id="myTable">
+								<?php foreach ($data['files'] as $file): 
+
+									?>
 									<tr>
 										<td>
 											<a href="<?php echo $file['url']; ?>" target="<?php echo $file['target']; ?>" class="item _blank <?php echo $file['extension']; ?>">
@@ -944,25 +952,16 @@ function pr($data, $die = false) {
 	
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 		<script>
-			$('#search').on('click', function(e) {
-				e.preventDefault();
-				var search_content = jQuery("#search_file").val();
-				if(search_content.length != 0){
-					$.ajax({
-			            type: 'POST',
-			            data: {
-			            	search:search_content
-			            },
-			            success: function () {
-			              alert("success");
-			            }
-      				});
-				}else{
-					alert("No search found");
-					return false;
-				}
+			$(document).ready(function(){
+			  $("#search_file").on("keyup", function() {
+				    var value = $(this).val().toLowerCase();
+				    $("#myTable tr").filter(function() {
+				      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+				    });
+			  });
 			});
-		</script>
+
+	</script>
 	
 </body>
 </html>
